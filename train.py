@@ -22,9 +22,9 @@ test_data = datasets.FashionMNIST(
 )
 
 
-BATCH_SIZE = 64
-LEARNING_RATE = 1e-3
-EPOCHS = 5
+BATCH_SIZE = 32
+LEARNING_RATE = 1e-2
+EPOCHS = 15
 
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
@@ -127,4 +127,5 @@ with mlflow.start_run():
         print(global_step)
         test(test_dataloader, model, loss_fn, global_step)
         mlflow.log_metric("epoch", t, step=global_step)
+    mlflow.pytorch.log_model(model, "mnist-model")
     print("Done!")
