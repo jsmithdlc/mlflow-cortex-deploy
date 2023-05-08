@@ -5,6 +5,8 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import mlflow
 
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+
 # Download training data from open datasets.
 training_data = datasets.FashionMNIST(
     root="data",

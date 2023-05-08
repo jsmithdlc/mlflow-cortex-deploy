@@ -150,6 +150,7 @@ cython_debug/
 
 # Mlflow
 mlruns/
+mlartifacts/
 
 # Data folder
 data/
