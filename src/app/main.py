@@ -11,13 +11,21 @@ import io
 
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
+device = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
+
 app = FastAPI()
 model: torch.nn.Module = mlflow.pytorch.load_model(
-    "runs:/ff25d15795b74f9d8a27d122b2c47fe9/mnist-model"
+    "runs:/ff25d15795b74f9d8a27d122b2c47fe9/mnist-model",
+    map_location=torch.device(device),
 )
-transform = ToTensor()
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+transform = ToTensor()
 
 classes = [
     "T-shirt/top",

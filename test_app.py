@@ -3,8 +3,8 @@ from PIL import Image
 import os
 import json
 
-base_url = "http://127.0.0.1:8000/"
-img_path = "./app/condor.jpg"
+base_url = "http://127.0.0.1:80/"
+img_path = "./samples/shoe.jpeg"
 
 payload = {
     "img_file": open(img_path, "rb"),
