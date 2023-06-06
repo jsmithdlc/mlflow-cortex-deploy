@@ -4,7 +4,7 @@ import os
 import json
 
 base_url = "http://127.0.0.1:80/"
-img_path = "./samples/shoe.jpeg"
+img_path = "./samples/strawberry_dress.png"
 
 payload = {
     "img_file": open(img_path, "rb"),

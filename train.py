@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 import mlflow
+from mlflow.models.signature import infer_signature
 
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
@@ -129,5 +130,32 @@ with mlflow.start_run():
         print(global_step)
         test(test_dataloader, model, loss_fn, global_step)
         mlflow.log_metric("epoch", t, step=global_step)
-    mlflow.pytorch.log_model(model, "mnist-model")
+
+    # infer model signature and create an input example to register with model
+    for X, y in train_dataloader:
+        signature = infer_signature(X.numpy(), y.numpy())
+        input_example = X.numpy()
+        break
+
+    # log model
+    mlflow.pytorch.log_model(
+        model,
+        "mnist-model",
+        signature=signature,
+        input_example=input_example,
+        metadata={
+            "classes": [
+                "T-shirt/top",
+                "Trouser",
+                "Pullover",
+                "Dress",
+                "Coat",
+                "Sandal",
+                "Shirt",
+                "Sneaker",
+                "Bag",
+                "Ankle boot",
+            ]
+        },
+    )
     print("Done!")

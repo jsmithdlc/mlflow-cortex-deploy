@@ -6,10 +6,15 @@ import numpy as np
 
 from fastapi import FastAPI, UploadFile
 from PIL import Image
+from pydantic import BaseSettings
 import io
+import json
 
 
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+class Settings(BaseSettings):
+    model_stage: str
+    model_name: str
+
 
 device = (
     "cuda"
@@ -19,26 +24,24 @@ device = (
     else "cpu"
 )
 
-app = FastAPI()
-model: torch.nn.Module = mlflow.pytorch.load_model(
-    "runs:/ff25d15795b74f9d8a27d122b2c47fe9/mnist-model",
+settings = Settings()
+
+# fetches last version of model in specified stage
+model_path = "models:/{}/{}".format(settings.model_name, settings.model_stage)
+model = mlflow.pytorch.load_model(
+    model_uri=model_path,
     map_location=torch.device(device),
 )
 
+# model input shape and classes can be extracted from model info
+model_info = mlflow.models.get_model_info(model_uri=model_path)
+input_shape = model_info.signature.inputs.to_dict()[0]["tensor-spec"]["shape"]
+output_classes = model_info.metadata["classes"]
+
+# transforms a PIL image into a tensor.
 transform = ToTensor()
 
-classes = [
-    "T-shirt/top",
-    "Trouser",
-    "Pullover",
-    "Dress",
-    "Coat",
-    "Sandal",
-    "Shirt",
-    "Sneaker",
-    "Bag",
-    "Ankle boot",
-]
+app = FastAPI()
 
 
 @app.get("/healthz")
@@ -48,14 +51,15 @@ def read_healthz():
 
 @app.post("/predict")
 def predict(img_file: UploadFile):
+    # image is read from payload and resized + reshaped to model input shape
     contents = img_file.file.read()
     image = Image.open(io.BytesIO(contents)).convert("L")
-    image = image.resize((28, 28))
+    image = image.resize([input_shape[-2], input_shape[-1]])
     model_input = transform(image)
-    model_input = model_input.reshape((1, 1, 28, 28))
+    model_input = model_input.reshape(input_shape)
     model.eval()
     with torch.no_grad():
         model_input = model_input.to(device)
         pred = model(model_input)
-        predicted = classes[pred[0].argmax(0)]
+        predicted = output_classes[pred[0].argmax(0)]
     return {"prediction": predicted}
