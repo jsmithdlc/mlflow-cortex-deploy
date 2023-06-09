@@ -1,5 +1,6 @@
 #!/bin/bash
-sudo yum install python3.10
-sudo pip3 install mlflow
-sudo yum install httpd-tools
-sudo yum install nginx
+sudo yum update -y
+sudo yum install python3-pip -y
+pip3 install mlflow
+sudo yum install httpd-tools -y
+sudo yum install nginx -y

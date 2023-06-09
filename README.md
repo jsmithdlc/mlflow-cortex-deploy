@@ -32,30 +32,30 @@ mlflow ui
 
 ### Server
 
+- Attach ec2 instance profile with s3 access
+- Open Security group for ssh and TCP 80
+- Attach user data on instance creation
+- Configure NGINX
+  
 ```bash
-sudo yum install python3.10
-sudo pip3 install mlflow
-sudo yum install httpd-tools
-sudo yum install nginx
 sudo htpasswd -c /etc/nginx/.htpasswd testuser
 sudo nano /etc/nginx/nginx.conf
-
-location / {
-proxy_pass http://localhost:5000/;
-auth_basic “Restricted Content”;
-auth_basic_user_file /etc/nginx/.htpasswd;
-}
-
-sudo service nginx start
-mlflow server --host 0.0.0.0
 ```
 
+```conf
+location / {
+proxy_pass http://localhost:5000/;
+auth_basic 'Restricted Content';
+auth_basic_user_file /etc/nginx/.htpasswd;
+}
+```
+
+- Start nginx and mlflow server
+
 ```bash
+sudo service nginx start
 mlflow server \
   --backend-store-uri file:///path/to/mlruns \
-  # Artifact access is enabled through the proxy URI 'mlflow-artifacts:/',
-  # giving users access to this location without having to manage credentials
-  # or permissions.
   --artifacts-destination s3://bucket_name \
-  --host remote_host
+  --host 0.0.0.0
 ```
