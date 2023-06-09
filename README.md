@@ -50,7 +50,8 @@ auth_basic_user_file /etc/nginx/.htpasswd;
 }
 ```
 
-- Start nginx and mlflow server
+- Start nginx and mlflow server with SQL Lite database and connection to S3 bucket for artifact store. For a more persistant and reliable solution, you should use a postgresql with services such as **AWS RDS**.
+
 
 ```bash
 sudo service nginx start
