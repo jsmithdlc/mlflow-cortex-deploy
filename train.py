@@ -3,10 +3,15 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+from dotenv import dotenv_values
 import mlflow
 from mlflow.models.signature import infer_signature
+import os
 
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+# load variables from .env file and set them to environment
+mlflow_vars = dotenv_values()
+for key, value in mlflow_vars.items():
+    os.environ[key] = value
 
 # Download training data from open datasets.
 training_data = datasets.FashionMNIST(
