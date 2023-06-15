@@ -2,6 +2,7 @@
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![mlflow 2.4.1](https://img.shields.io/badge/mlflow-2.4.1-lightblue.svg)](https://mlflow.org/docs/2.4.1/index.html)
+[![pytorch 1.12.1](https://img.shields.io/badge/pytorch-1.12-red.svg)](https://pytorch.org/docs/1.12/)
 
 This repository is meant as a reference guide to deploy and manage production machine learning workloads in a simple manner, by using two cool frameworks [MlFlow](https://mlflow.org/docs/latest/index.html) and [Cortex](https://docs.cortexlabs.com/).
 
@@ -9,7 +10,8 @@ This repository is meant as a reference guide to deploy and manage production ma
   - [MlFlow Setup](#mlflow-setup)
     - [Local](#local)
     - [Server](#server)
-  - [Tracking Experiments](#tracking-experiments)
+  - [Track Experiments](#track-experiments)
+  - [API to serve requests with trained model](#api-to-serve-requests-with-trained-model)
 
 This project was developed using Python 3.10. Install dependencies by running:
 
@@ -67,9 +69,36 @@ mlflow server \
 
 8. After setting this up, you can connect to MlFlow using the instance public ip adress and entering the credentials you've defined in the nginx config.
 
-## Tracking Experiments
+## Track Experiments
 
 Once mlflow has been setup, you can log metrics, configuration files and, perhaps most importantly, your models into mlflow. But first, you'll need to configure some environment variables.
 
-Copy [env.template](env.template) into a *.env* file at the root of this project and define the variables according to your mlflow deployment.
+Copy [env.template](env.template) into a *.env* file at the root of this project and define the variables according to your mlflow deployment (local or server).
 
+Then you can run `python train.py`. This will train a simple neural network classifier over the Fashion MNIST dataset and log into mlflow the following:
+
+- Parameters such as learning rate, batch size and number of epochs via the `mlflow.log_params` method.
+- Metrics such as loss values and accuracy across training via the `mlflow.log_metrics` method
+- Pytorch trained model weights and files via the `mlflow.log_model` method.
+
+You can explore how the experiment progresses in real time through your mlflow ui.
+
+## API to serve requests with trained model
+
+FastAPI and Docker are used to package the trained model for requesting inferences in a REST manner.
+
+As in the [Track Experiments](#track-experiments) section, you'll first need to set some environment variables inside a *.env* file within the src/ directory. Create this file by using the [template](src/.env.template) as base.
+
+The FastAPI code is defined within [src/app/main.py](src/app/main.py). It fetches a fashion-classifier model registered in mlflow and responds to requests in the /predict path. You can inspect it to understand more.
+
+Inside src/, you'll also find a *Dockerfile* that packages the api and launches your api server in [http://127.0.0.1:80](http://127.0.0.1:80). Run it with the following command
+
+```bash
+./run_docker.sh
+```
+
+Test the api with a sample image:
+
+```bash
+python test_api.py --img_path dress.png
+```
