@@ -10,7 +10,7 @@ This repository is meant as a reference guide to deploy and manage production ma
   - [MlFlow Setup](#mlflow-setup)
     - [Local](#local)
     - [Server](#server)
-  - [Track Experiments](#track-experiments)
+  - [FashionMNIST Classifier Experiment Tracking](#fashionmnist-classifier-experiment-tracking)
   - [API to serve requests with trained model](#api-to-serve-requests-with-trained-model)
 
 This project was developed using Python 3.10. Install dependencies by running:
@@ -69,7 +69,7 @@ mlflow server \
 
 8. After setting this up, you can connect to MlFlow using the instance public ip adress and entering the credentials you've defined in the nginx config.
 
-## Track Experiments
+## FashionMNIST Classifier Experiment Tracking
 
 Once mlflow has been setup, you can log metrics, configuration files and, perhaps most importantly, your models into mlflow. But first, you'll need to configure some environment variables.
 
@@ -100,5 +100,5 @@ Inside src/, you'll also find a *Dockerfile* that packages the api and launches 
 Test the api with a sample image:
 
 ```bash
-python test_api.py --img_path dress.png
+python test_local_api.py --img_path dress.png
 ```
