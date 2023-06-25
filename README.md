@@ -63,13 +63,16 @@ location / {
 
 ```bash
 sudo service nginx start
+# install mlflow
+pip3 install mlflow
+# start mlflow
 mlflow server \
   --backend-store-uri file:<path/to/mlruns> \
   --artifacts-destination s3://<bucket_name> \
   --host 0.0.0.0
 ```
 
-9. After setting this up, you can connect to MlFlow using the instance public ip adress and entering the credentials you've defined in the nginx config. You can use `Ctrl+B+D` to dettach from your tmux shell, so you can safely logout from the instance and `tmux attach` to reattach to your shell.
+1. After setting this up, you can connect to MlFlow using the instance public ip adress (dont use https as this is not configured) and entering the credentials you've defined in the nginx config. You can use `Ctrl+B+D` to dettach from your tmux shell, so you can safely logout from the instance and `tmux attach` to reattach to your shell.
 
 ## FashionMNIST Classifier Experiment Tracking
 
