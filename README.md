@@ -38,7 +38,7 @@ You can access the mlflow interface by going to [http://127.0.0.1:5000](http://1
 This part guides you through setting up mlflow in an AWS EC2 instance with S3 as an artifact store and a sqlite as a backend store. First, you should follow these steps:
 
 1. Create an S3 bucket to use as an artifact store. This is where the model registry will reside as well as other experiment artifacts logged into mlflow.
-2. [Launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html). Upon creation, attach an IAM role that grants your instance access to the S3 bucket you've created in the previous step. Also, copy and paste the user data from [mlflow_user_data](mlflow_user_data.sh)
+2. [Launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html). Upon creation, **attach an IAM role that grants your instance access to the S3 bucket** you've created in the previous step. Also, copy and paste the user data from [mlflow_user_data](mlflow_user_data.sh)
 3. Edit your security group inbound rules to allow access to the instance from your IP through ssh (port 22) and HTTP (port 80). If there are problems connecting, check this [troubleshoot guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html)
 4. Connect to your instance through ssh.
 5. Configure a password for your server by running the following command, replacing *testuser* with your desired username.
@@ -57,17 +57,19 @@ location / {
 }
 ```
 
-7. Start nginx and the mlflow server.
+7. Start tmux shell by running `tmux`
+
+8. Start nginx and the mlflow server.
 
 ```bash
 sudo service nginx start
 mlflow server \
-  --backend-store-uri file:///path/to/mlruns \
-  --artifacts-destination s3://bucket_name \
+  --backend-store-uri file:<path/to/mlruns> \
+  --artifacts-destination s3://<bucket_name> \
   --host 0.0.0.0
 ```
 
-8. After setting this up, you can connect to MlFlow using the instance public ip adress and entering the credentials you've defined in the nginx config.
+9. After setting this up, you can connect to MlFlow using the instance public ip adress and entering the credentials you've defined in the nginx config. You can use `Ctrl+B+D` to dettach from your tmux shell, so you can safely logout from the instance and `tmux attach` to reattach to your shell.
 
 ## FashionMNIST Classifier Experiment Tracking
 
